@@ -1,7 +1,6 @@
 # Command line assembler for the [flat assembler](https://flatassembler.net/docs.php) (v1.73) dialect of assembly language
 
-- Attempted port of the awesome flat assembler which is a self-hosted assembler.
-The creator is insanely talented, and I hope to replicate only a fraction of the performance and capability it has.
+- The goal here is mainly to deepen my understanding of parsing, assembling, compiling, linking, etc...
 
 ## WIP
 
