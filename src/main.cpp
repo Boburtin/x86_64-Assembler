@@ -1,13 +1,9 @@
-#include "STLAlias.inc"
-
 #include <cstdio>
 
 #include "Preproc.h"
 #include "Prim.h"
 #include "Source.h"
 #include "TokUtils.h"
-
-#define EXIT_USAGE 2
 
 const char *BOLD = "\033[1m[%05llu]\033[0m %s";
 
@@ -16,16 +12,20 @@ const char *chFailure = "[-]";
 const char *chWarning = "[!]";
 const char *chUpdate = "[*]";
 
-const char *Eof = "\033[1;32mEOF!\033[0m";
-const char *Punct = "\033[3;31mPunct\033[0m";
-const char *Endl = "\033[1;33mEndl\033[0m";
-const char *String = "\033[3;30mString\033[0m";
+const char *Eof = " \033[1;32mEOF!\033[0m";
+const char *Punct = " \033[3;31mPunct\033[0m";
+const char *Endl = "  \033[1;33mEndl\033[0m";
+const char *String = " \033[3;30mString\033[0m";
 const char *Symbol = "\033[3;34mSymbol\033[0m";
 
-int main(int argc, char **argv) {
-    if (argc < 2) {
+const char *TokType[] = {String, Symbol, Punct, Eof, Endl};
+
+int main(int argc, char **argv)
+{
+    if (argc < 2)
+    {
         fprintf(stderr, "\n\033[1;36m%s usage:\033[35m pqry <file>\033[0m\n", chFailure);
-        return EXIT_USAGE;
+        return 2;
     }
 
     auto src = Source::fromFile(argv[1]);
@@ -36,29 +36,23 @@ int main(int argc, char **argv) {
     preproc.run();
 
     auto tknPrint = [](const TokArray &t) {
-        for (usize i{}; i < t.size; ++i) {
-            switch (t.kind[i]) {
-            case TokKind::Symbol:
-                printf(BOLD, i, Symbol);
-                break;
-            case TokKind::Endl:
-                putchar('\n');
-                break;
-            case TokKind::Eof:
-                printf(BOLD, i, Eof);
-                break;
-            case TokKind::Punct:
-                printf(BOLD, i, Punct);
-                break;
-            case TokKind::String:
-                printf(BOLD, i, String);
-                break;
+        for (std::size_t i{}; i < t.size; ++i)
+        {
+            std::printf(BOLD, i, TokType[std::to_underlying(t.kind[i])]);
+
+            if (i % 12 == 11)
+            {
+                std::putchar('\n');
             }
         }
     };
 
+    std::puts("\n\nTokens after first pass:\n");
+
     tknPrint(toks);
-    puts("\n\n");
+
+    std::puts("\n\nTokens after second pass:\n");
+
     tknPrint(preproc.out);
 
     return 0;

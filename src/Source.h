@@ -5,27 +5,40 @@
 #include <iterator>
 #include <string>
 
-#include "STLAlias.inc"
-
-class Source {
+class Source
+{
   public:
-    Source(std::string &&str) : bytes(str) {
-        if (bytes.size() >= 3 && static_cast<uchar>(bytes[0]) == 0xEF &&
-            static_cast<uchar>(bytes[1]) == 0xBB && static_cast<uchar>(bytes[2]) == 0xBF)
-            bytes.erase(0, 3);
+    Source(std::string &&str) : bytes_(str)
+    {
+        // TODO: handle UTF16 and UTF32 BOM
+        if (bytes_.size() >= 3 && (static_cast<std::uint8_t>(bytes_[0]) == 0xEF) &&
+            (static_cast<std::uint8_t>(bytes_[1]) == 0xBB) && (static_cast<std::uint8_t>(bytes_[2]) == 0xBF))
+        {
+            bytes_.erase(0, 3);
+        }
     }
-    static Source fromFile(const char *fp) {
+    static Source fromFile(const char *fp)
+    {
         std::ifstream file(fp, std::ios::binary);
-        auto res = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-        return Source(std::move(res));
+
+        return Source({(std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>()});
     }
 
-    u32 size() const { return bytes.size(); }
-    char at(u32 idx) const { return bytes[idx]; }
-    const char *data() const { return bytes.data(); }
+    std::uint32_t size() const noexcept
+    {
+        return bytes_.size();
+    }
+    char at(std::uint32_t idx) const noexcept
+    {
+        return bytes_[idx];
+    }
+    const char *data() const noexcept
+    {
+        return bytes_.data();
+    }
 
   private:
-    std::string bytes;
+    std::string bytes_;
 };
 
 #endif
